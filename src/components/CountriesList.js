@@ -1,8 +1,7 @@
 import React from "react";
 
-import axios from "axios";
-
 import LeftSideCountry from "./LeftSideCountry";
+import Weather from "./Weather";
 
 function CountriesList({
   inputValue,
@@ -10,34 +9,6 @@ function CountriesList({
   selectedNumber,
   selectCountry,
 }) {
-  const feElement = (data) => {
-    console.log(
-      `Current temperature in ${data.location.name} is ${data.current.temperature}℃`
-    );
-
-    return (
-      <div>
-        Current temperature in ${data.location.name} is $
-        {data.current.temperature}℃
-      </div>
-    );
-  };
-
-  const weatherBox = (city) => {
-    axios
-      .get(
-        "http://api.weatherstack.com/current?access_key=2b889ecb932a35ed186d772e59ae8e84&query=" +
-          city
-      )
-      .then((response) => {
-        const apiResponse = response.data;
-        feElement(apiResponse);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   let listView;
 
   if (inputValue.length > 0) {
@@ -67,31 +38,35 @@ function CountriesList({
     } else if (filtedCountry.length < 1) {
       listView = <p>not found</p>;
     } else if (filtedCountry.length === 1) {
-      let listView2;
-      weatherBox(filtedCountry[0].capital);
+      return (
+        <div className="country-box">
+          <div>
+            <h1>{filtedCountry[0].name}</h1>
+            <p>Capital: {filtedCountry[0].capital}</p>
+            <p>Population: {filtedCountry[0].population} </p>
+            <h2>languages</h2>
 
-      listView2 = filtedCountry.map((item, index) => (
-        <div key={index}>
-          <h1>{item.name}</h1>
-          <p>Capital: {item.capital}</p>
-          <p>Population: {item.population} </p>
-          <h2>languages</h2>
-          <ul>
-            {item.languages.map((item, index) => (
-              <li key={index}>{item.name}</li>
-            ))}
-          </ul>
-          <img style={{ width: 150, height: 150 }} src={item.flag} alt="" />
+            <ul>
+              {filtedCountry[0].languages.map((item, index) => (
+                <li key={index}>{item.name}</li>
+              ))}
+            </ul>
+            <img
+              style={{ width: 150, height: 150 }}
+              src={filtedCountry[0].flag}
+              alt=""
+            />
+            <Weather capital={filtedCountry[0].capital} />
+          </div>
         </div>
-      ));
-
-      listView = listView2;
+      );
     } else {
       listView = <p>Too many match, specify other filter</p>;
     }
   } else {
     listView = "";
   }
+
   return (
     <div className="country-box">
       {listView}
